@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Text2Talk — English Academy</title>
+    <meta
+      name="description"
+      content="Text2Talk English Academy — Syllabus + Free Spoken. Contact / Demo / Spoken English classes."
+    />
+    <link rel="stylesheet" href="/style/style.css">
+  </head>
+  <body>
+    <!-- Background particle canvas -->
+    <canvas id="bgCanvas"></canvas>
+
+    <div class="site">
+      <header>
+        <img
+          src="/cover/PRASHANTA.png"
+          alt="cover"
+          class="header-cover"
+        />
+        <img
+          src="/img/logo.png"
+          alt="logo"
+          class="logo"
+        />
+        <div>
+          <div class="muted heading">Text2Talk</div>
+          <div style="font-size: 13px; color: var(--muted)">
+            English Academy — By Prashanta
+          </div>
+        </div>
+      </header>
+
+      <!-- HERO with typewriter -->
+      <div class="hero">
+        <div class="hero-left">
+          <h1 class="academy-name">
+            Welcome to <span class="typer" id="typewriter"></span>
+          </h1>
+          <p class="intro">
+            Text2Talk is a focused English academy offering structured syllabus
+            coaching, daily spoken practice, mock tests and interview/GD
+            preparation for students from 6th to 12th and BA general English
+            learners. We combine board-oriented classes with spoken sessions so
+            students learn to speak, not just memorize.
+          </p>
+
+          <div class="cta-row">
+            <button class="btn" id="bookDemo">Book a Free Demo</button>
+            <button class="btn" id="callNow">Call / WhatsApp</button>
+          </div>
+        </div>
+
+        <div
+          style="width: 340px; display: flex; flex-direction: column; gap: 12px"
+        >
+          <section
+            style="
+              padding: 16px;
+              border-radius: 12px;
+              background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.02),
+                transparent
+              );
+              border: 1px solid var(--glass-border);
+            "
+          >
+            <strong>Quick Info</strong>
+            <div class="muted" style="margin-top: 8px">
+              Location: Jhawtala, Shyamnagar
+            </div>
+            <div style="margin-top: 10px; font-size: 14px">
+              Phone: <span class="muted">+91 8961484431</span>
+            </div>
+            <div style="margin-top: 8px">
+              Demo Class Available • Spoken sessions from Day 1
+            </div>
+          </section>
+
+          <section
+            style="
+              padding: 12px;
+              border-radius: 12px;
+              min-height: 120px;
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+              justify-content: center;
+              align-items: center;
+            "
+          >
+            <img
+              src="/img/facebook.jpg"
+              alt="social"
+              style="
+                height: 64px;
+                border-radius: 8px;
+                object-fit: cover;
+                border: 1px solid var(--glass-border);
+              "
+            />
+            <a class="muted" href="https://www.facebook.com/people/Speak-with-Prashant/100076413876394/">Speak With Prashant</a>
+            <div class="muted">Subscribe to our channel for tips</div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Features timeline that appear one by one while scrolling -->
+      <section id="features">
+        <h2>What we offer</h2>
+        <div class="timeline" id="timeline">
+          <div class="feature-tile">
+            <div class="dot"></div>
+            <div>
+              <h3>All Boards — Classes 6th to 12th</h3>
+              <div class="muted">
+                CBSE, ICSE, State Boards and BA General English with
+                board-aligned content.
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-tile">
+            <div class="dot"></div>
+            <div>
+              <h3>Free Spoken for Every Student</h3>
+              <div class="muted">
+                Each batch includes daily spoken practice, GD and interview
+                prep.
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-tile">
+            <div class="dot"></div>
+            <div>
+              <h3>Grammar & Writing Mastery</h3>
+              <div class="muted">
+                Sentence patterns, creative writing, quotes and presentation
+                skills.
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-tile">
+            <div class="dot"></div>
+            <div>
+              <h3>Monthly Mock Tests & Doubt Sessions</h3>
+              <div class="muted">
+                Regular tests to monitor growth and focused doubt clearing
+                sessions.
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-tile">
+            <div class="dot"></div>
+            <div>
+              <h3>Pronunciation & Public Speaking</h3>
+              <div class="muted">
+                Practical drills, tongue twisters, and confidence-building
+                activities.
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-tile">
+            <div class="dot"></div>
+            <div>
+              <h3>Creative Exercises</h3>
+              <div class="muted">
+                Quotes, sentence making, real-world usage and writing prompts.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Grid highlight section (also revealed on scroll) -->
+      <section>
+        <h2>Highlights</h2>
+        <div class="features-grid" id="grid">
+          <div class="feature">
+            <h3>Interactive Classes</h3>
+            <p>
+              Small groups and active speaking exercises to ensure
+              participation.
+            </p>
+          </div>
+          <div class="feature">
+            <h3>Experienced Faculty</h3>
+            <p>Teachers focused on both board success and spoken fluency.</p>
+          </div>
+          <div class="feature">
+            <h3>Affordable Batches</h3>
+            <p>Flexible batch timings and clear fee structure.</p>
+          </div>
+          <div class="feature">
+            <h3>Placement Support</h3>
+            <p>
+              Interview and campus placement preparation for older students.
+            </p>
+          </div>
+          <div class="feature">
+            <h3>Daily Vocab</h3>
+            <p>Short, practical words & phrases to build confidence quickly.</p>
+          </div>
+          <div class="feature">
+            <h3>Flexible Demo</h3>
+            <p>
+              Free demo classes to experience our teaching style before joining.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact section -->
+      <section id="contact">
+        <h2>Contact / Book a Demo</h2>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 18px">
+          <div>
+            <form
+              class="contact-form"
+              id="contactForm"
+              onsubmit="return sendMail(event)"
+            >
+              <label class="muted">Name</label>
+              <input id="name" required />
+              <label class="muted">Email</label>
+              <input id="email" type="email" required />
+              <label class="muted">Message</label>
+              <textarea id="message" rows="6" required></textarea>
+              <div style="margin-top: 12px; display: flex; gap: 10px">
+                <button class="btn" type="submit">Send Email</button>
+                <button class="btn" type="button" id="openWhats">
+                  Open WhatsApp
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div
+            style="
+              padding: 14px;
+              border-radius: 12px;
+              background: rgba(255, 255, 255, 0.02);
+              border: 1px solid var(--glass-border);
+            "
+          >
+            <div style="font-weight: 700">Call / WhatsApp</div>
+            <div class="muted" style="margin-top: 8px">8961484431</div>
+            <div style="margin-top: 12px">
+              Click to call or message us. We reply quickly on WhatsApp.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer>© Text2Talk English Academy — Built for clarity and speed</footer>
+    </div>
+    <script src="/src/script.js"></script>
+  </body>
+</html>
+     
