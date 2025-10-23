@@ -1,0 +1,9 @@
+{
+  "name": "text-2-talk",
+  "version": "1.0.0",
+  "description": "Text2Talk English Academy Website with Gemini AI Integration",
+  "main": "src/script.js",
+  "dependencies": {
+    "@google/generative-ai": "^0.1.3"
+  }
+}

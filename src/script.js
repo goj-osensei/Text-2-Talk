@@ -1,193 +1,274 @@
-// ----------------- Config -----------------
-      const CONTACT_PHONE = "+918961484431";
-      const CONTACT_WHATSAPP = "https://wa.me/918961484431";
-      const CONTACT_EMAIL = "prashantmajumder4@gmail.com";
-      // ------------------------------------------
+/* /src/script.js
+   Single client-side file:
+   - typewriter
+   - scroll reveal for features & highlights
+   - simple particle background
+   - contact form (mailto fallback)
+   - WhatsApp open
+   - chatbot UI + Gemini call to /api/gemini (server proxy)
+   - localStorage chat history
+*/
 
-      // Typewriter for academy name
-      const words = [
-        "Text2Talk",
-        "Text 2 Talk English Academy",
-        "Speak with Prashanta",
-      ];
-      const el = document.getElementById("typewriter");
-      let wIdx = 0,
-        cIdx = 0,
-        forward = true;
-      function typeLoop() {
-        const word = words[wIdx];
-        if (forward) {
-          el.textContent = word.slice(0, cIdx + 1);
-          cIdx++;
-          if (cIdx === word.length) {
-            forward = false;
-            setTimeout(typeLoop, 900);
-            return;
-          }
-        } else {
-          el.textContent = word.slice(0, cIdx - 1);
-          cIdx--;
-          if (cIdx === 0) {
-            forward = true;
-            wIdx = (wIdx + 1) % words.length;
-            setTimeout(typeLoop, 400);
-            return;
-          }
-        }
-        setTimeout(typeLoop, 60 + Math.random() * 80);
+/* ---------- Utility & DOM references ---------- */
+const byId = id => document.getElementById(id);
+const timeline = byId('timeline');
+const grid = byId('grid');
+const chatBtn = byId('geminiChatbot');
+const chatInterface = byId('chatInterface');
+const openWhats = document.getElementById('openWhats');
+const sendMessageBtn = byId('sendMessage');
+const chatInput = byId('chatInput');
+const chatMessages = byId('chatMessages');
+const closeChat = byId('closeChat');
+const typewriterEl = document.getElementById('typewriter');
+const contactForm = byId('contactForm');
+const bookDemo = byId('bookDemo');
+const callNow = byId('callNow');
+
+/* ---------- Typewriter ---------- */
+(function typewriter() {
+  const words = ['Text2Talk', 'Speak With Prashanta'];
+  let i = 0, j = 0, back = false;
+  const speed = 80;
+  function tick() {
+    const word = words[i];
+    if (!back) {
+      typewriterEl.textContent = word.slice(0, ++j);
+      if (j === word.length) {
+        back = true;
+        setTimeout(tick, 700);
+        return;
       }
-      typeLoop();
+    } else {
+      typewriterEl.textContent = word.slice(0, --j);
+      if (j === 0) {
+        back = false;
+        i = (i + 1) % words.length;
+      }
+    }
+    setTimeout(tick, speed);
+  }
+  tick();
+})();
 
-      // Buttons
-      document.getElementById("callNow").addEventListener("click", () => {
-        window.location.href = "tel:" + CONTACT_PHONE;
+/* ---------- Scroll reveal for timeline & grid ---------- */
+(function revealOnScroll() {
+  const observerOpts = { threshold: 0.15 };
+  const reveal = entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('show');
+      }
+    });
+  };
+  const observer = new IntersectionObserver(reveal, observerOpts);
+  document.querySelectorAll('.feature, .feature-tile').forEach(el => observer.observe(el));
+})();
+
+/* ---------- Simple particle background (lightweight) ---------- */
+(function particles() {
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
+  let w = canvas.width = innerWidth;
+  let h = canvas.height = innerHeight;
+  const particles = [];
+  const count = Math.floor((w * h) / 60000) + 25; // scale with screen
+
+  function rand(min, max){ return Math.random() * (max - min) + min; }
+
+  function createParticles() {
+    particles.length = 0;
+    for (let i=0;i<count;i++){
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: rand(0.9, 2.6),
+        vx: rand(-0.25, 0.25),
+        vy: rand(-0.15, 0.15),
+        alpha: rand(0.08, 0.28)
       });
-      document.getElementById("bookDemo").addEventListener("click", () => {
-        window.location.href = `mailto:${CONTACT_EMAIL}?subject=Demo%20Class%20Request&body=Hi%2C%20I%20would%20like%20to%20book%20a%20demo%20class.`;
-      });
-      document.getElementById("openWhats").addEventListener("click", () => {
-        window.open(CONTACT_WHATSAPP, "_blank");
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    for (const p of particles) {
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fill();
+      // update
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < -10) p.x = w + 10;
+      if (p.x > w + 10) p.x = -10;
+      if (p.y < -10) p.y = h + 10;
+      if (p.y > h + 10) p.y = -10;
+    }
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => {
+    w = canvas.width = innerWidth;
+    h = canvas.height = innerHeight;
+    createParticles();
+  });
+
+  // gentle parallax on mouse
+  window.addEventListener('mousemove', (e) => {
+    const cx = e.clientX / w - 0.5;
+    const cy = e.clientY / h - 0.5;
+    for (let i=0;i<particles.length;i++){
+      particles[i].x += cx * 0.3 * (i % 3 === 0 ? 1 : -1);
+      particles[i].y += cy * 0.2;
+    }
+  });
+
+  createParticles();
+  draw();
+})();
+
+/* ---------- Contact form & buttons ---------- */
+function sendMail(e) {
+  e.preventDefault();
+  const name = byId('name').value.trim();
+  const email = byId('email').value.trim();
+  const message = byId('message').value.trim();
+  if (!name || !email || !message) {
+    alert('Please fill the form before sending.');
+    return false;
+  }
+  // fallback: open mailto with prefilled content
+  const subject = encodeURIComponent(`Demo request from ${name}`);
+  const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
+  window.location.href = `mailto:prashanta@example.com?subject=${subject}&body=${body}`;
+  return false;
+}
+window.sendMail = sendMail;
+
+if (openWhats) {
+  openWhats.addEventListener('click', () => {
+    // opens WhatsApp chat - change number if needed
+    window.open('https://wa.me/918961484431', '_blank');
+  });
+}
+if (bookDemo) {
+  bookDemo.addEventListener('click', () => {
+    // scroll to contact
+    document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+    // focus name
+    setTimeout(()=> byId('name').focus(), 400);
+  });
+}
+if (callNow) {
+  callNow.addEventListener('click', () => {
+    window.location.href = 'tel:+918961484431';
+  });
+}
+
+/* ---------- Chat UI toggles & persistence ---------- */
+(function chatUI() {
+  const STORAGE_KEY = 't2t_chat_history_v1';
+
+  function renderMessage(text, who='bot', opts={}) {
+    const el = document.createElement('div');
+    el.className = 'message ' + (who === 'bot' ? 'bot' : 'user');
+    el.textContent = text;
+    if (opts.loading) el.classList.add('loading');
+    chatMessages.appendChild(el);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return el;
+  }
+
+  function saveHistory(history) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(history)); } catch(e){}
+  }
+
+  function loadHistory() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e){ return []; }
+  }
+
+  function appendToHistory(entry) {
+    const hist = loadHistory();
+    hist.push(entry);
+    saveHistory(hist);
+  }
+
+  // populate history
+  (function populate() {
+    const history = loadHistory();
+    if (history.length === 0) {
+      renderMessage("Hello! I'm your AI assistant. How can I help you today?");
+      return;
+    }
+    for (const m of history) {
+      renderMessage(m.text, m.who);
+    }
+  })();
+
+  // open / close
+  chatBtn.addEventListener('click', ()=> {
+    chatInterface.classList.toggle('active');
+  });
+  closeChat.addEventListener('click', ()=> chatInterface.classList.remove('active'));
+
+  // send on button / enter
+  function userSend(text) {
+    if (!text || !text.trim()) return;
+    const trimmed = text.trim();
+    renderMessage(trimmed, 'user');
+    appendToHistory({ who: 'user', text: trimmed, ts: Date.now() });
+    chatInput.value = '';
+    // call Gemini (server proxy)
+    callGemini(trimmed);
+  }
+
+  sendMessageBtn.addEventListener('click', () => userSend(chatInput.value));
+  chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); userSend(chatInput.value); } });
+
+  /* ---------- Gemini call (POST to /api/gemini) ---------- */
+  let isRequesting = false;
+  async function callGemini(promptText) {
+    if (isRequesting) {
+      renderMessage('Please wait while I finish the previous response...', 'bot');
+      return;
+    }
+    isRequesting = true;
+    const loadingEl = renderMessage('...', 'bot', { loading: true });
+    try {
+      // POST to your server endpoint which holds the API key in .env
+      const resp = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: promptText })
       });
 
-      // Contact form -> mailto fallback
-      function sendMail(ev) {
-        ev.preventDefault();
-        const name = document.getElementById("name").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const message = document.getElementById("message").value.trim();
-        const subject = encodeURIComponent("Website Inquiry from " + name);
-        const body = encodeURIComponent(
-          "Name: " + name + "\n" + "Email: " + email + "\n" + "Message:" + message + "\n" + "I would like to book a demo class"
-        );
-        window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
-        return false;
+      if (!resp.ok) {
+        const txt = await resp.text();
+        throw new Error(`Server error: ${resp.status} ${txt}`);
       }
 
-      // Intersection Observer for reveal on scroll
-      const io = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("show");
-            }
-          });
-        },
-        { threshold: 0.18 }
-      );
+      // expecting JSON: { reply: "text" }
+      const data = await resp.json();
+      loadingEl.classList.remove('loading');
+      loadingEl.textContent = data.reply || '[no reply from server]';
+      appendToHistory({ who: 'bot', text: data.reply || '', ts: Date.now() });
+    } catch (err) {
+      console.error('Gemini call failed', err);
+      loadingEl.classList.remove('loading');
+      loadingEl.textContent = 'Sorry — I could not get a reply. Try again later.';
+      appendToHistory({ who: 'bot', text: loadingEl.textContent, ts: Date.now() });
+    } finally {
+      isRequesting = false;
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+  }
+})();
 
-      document
-        .querySelectorAll(".feature-tile")
-        .forEach((el) => io.observe(el));
-      document.querySelectorAll(".feature").forEach((el) => io.observe(el));
+/* ---------- Helper: Simple visual focus when user types (optional small UI nicety) ---------- */
+chatInput && chatInput.addEventListener('focus', () => chatInterface.classList.add('active'));
 
-      // --------- Background particles (cursor-tracking 3D feel) ---------
-      const canvas = document.getElementById("bgCanvas");
-      const ctx = canvas.getContext("2d");
-      let W = (canvas.width = innerWidth),
-        H = (canvas.height = innerHeight);
-      const DPR = Math.max(1, window.devicePixelRatio || 1);
-      canvas.width = W * DPR;
-      canvas.height = H * DPR;
-      canvas.style.width = W + "px";
-      canvas.style.height = H + "px";
-      ctx.scale(DPR, DPR);
-
-      window.addEventListener("resize", () => {
-        W = canvas.width = innerWidth;
-        H = canvas.height = innerHeight;
-        canvas.width = W * DPR;
-        canvas.height = H * DPR;
-        canvas.style.width = W + "px";
-        canvas.style.height = H + "px";
-        ctx.scale(DPR, DPR);
-        initParticles();
-      });
-
-      const mouse = { x: W / 2, y: H / 2 };
-      window.addEventListener("mousemove", (e) => {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-      });
-      window.addEventListener("touchmove", (e) => {
-        if (e.touches && e.touches[0]) {
-          mouse.x = e.touches[0].clientX;
-          mouse.y = e.touches[0].clientY;
-        }
-      });
-
-      class Particle {
-        constructor() {
-          this.reset();
-        }
-        reset() {
-          this.x = Math.random() * W;
-          this.y = Math.random() * H;
-          this.z = 0.2 + Math.random() * 1.8; // depth factor
-          this.r = 0.6 + Math.random() * 2.6; // radius
-          this.baseX = this.x;
-          this.baseY = this.y;
-          this.vx = (Math.random() - 0.5) * 0.2;
-          this.vy = (Math.random() - 0.5) * 0.2;
-          this.hue = 200 + Math.random() * 40;
-          this.alpha = 0.15 + Math.random() * 0.5;
-        }
-        update() {
-          // gentle float
-          this.baseX += Math.sin(this.z + Date.now() * 0.0002 + this.r) * 0.02;
-          this.baseY += Math.cos(this.z + Date.now() * 0.00019 + this.r) * 0.02;
-          // parallax based on mouse offset
-          const dx = (mouse.x - W / 2) * (0.0006 * this.z);
-          const dy = (mouse.y - H / 2) * (0.0006 * this.z);
-          this.x += (this.baseX + dx - this.x) * 0.06;
-          this.y += (this.baseY + dy - this.y) * 0.06;
-          this.x += this.vx;
-          this.y += this.vy;
-          // wrap
-          if (this.x < -50) this.x = W + 50;
-          if (this.x > W + 50) this.x = -50;
-          if (this.y < -50) this.y = H + 50;
-          if (this.y > H + 50) this.y = -50;
-        }
-        draw(ctx) {
-          const grad = ctx.createRadialGradient(
-            this.x,
-            this.y,
-            0,
-            this.x,
-            this.y,
-            this.r * 8
-          );
-          grad.addColorStop(0, `rgba(255,255,255,${0.02 * this.z + 0.04})`);
-          grad.addColorStop(1, `rgba(10,20,40,0)`);
-          ctx.beginPath();
-          ctx.fillStyle = grad;
-          ctx.arc(this.x, this.y, this.r * 6, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-
-      let particles = [];
-      function initParticles() {
-        particles = [];
-        const count = Math.min(120, Math.floor((W * H) / 60000));
-        for (let i = 0; i < count; i++) {
-          particles.push(new Particle());
-        }
-      }
-      initParticles();
-
-      function animate() {
-        ctx.clearRect(0, 0, W, H);
-        for (let p of particles) {
-          p.update();
-          p.draw(ctx);
-        }
-        requestAnimationFrame(animate);
-      }
-      animate();
-
-      // small performance tweak: pause canvas when not visible
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) cancelAnimationFrame(animate);
-        else requestAnimationFrame(animate);
-      });
+/* ---------- Small accessibility: allow clicking timeline items to expand more text ---------- */
+document.querySelectorAll('.feature-tile').forEach(tile => {
+  tile.addEventListener('click', () => tile.classList.toggle('expanded'));
+});
